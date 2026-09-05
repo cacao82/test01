@@ -2,497 +2,245 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>소프트웨어 동아리 - 사이버 폭력 정화 프로젝트</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BFS vs DFS 탐색 알고리즘 시뮬레이션</title>
 <style>
-    body {
-        background-color: #000;
-        color: #ff1111;
-        font-family: 'Pretendard', sans-serif;
-        margin: 0;
-        overflow: hidden;
-    }
-
-    #tv-screen {
-        height: 75vh;
-        position: relative;
-        border-bottom: 3px solid #222;
-        background: #050000;
-        overflow: hidden;
-    }
-
-    /* ⚠ 악플 */
-    .bad {
-        position: absolute;
-        white-space: nowrap;
-        font-weight: 800;
-        color: #ff3333;
-        font-size: 2.5rem;
-        opacity: 0.35;
-        animation: drift-bad linear forwards;
-    }
-
-    @keyframes drift-bad {
-        from { left: 110%; }
-        to { left: -150%; }
-    }
-
-    /* ✨ 고운말 */
-    .good {
-        position: absolute;
-        white-space: nowrap;
-        font-weight: 900;
-        color: #00ff88;
-        text-shadow: 0 0 30px #00ff88;
-        z-index: 100;
-        animation: drift-good linear forwards;
-    }
-
-    @keyframes drift-good {
-        from { left: 110%; }
-        to { left: -250%; }
-    }
-
-    /* 입력창 영역 */
-    #input-area {
-        height: 25vh;
-        background: #0a0a0a;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border-top: 2px solid #00ff88;
-    }
-
-    #status-msg {
-        color: #00ff88;
-        margin-bottom: 10px;
-        font-weight: bold;
-        font-size: 1.2rem;
-        font-family: 'Courier New', monospace;
-    }
-
-    /* 게이지 */
-    #progress-container {
-        width: 85%;
-        height: 20px;
-        background: #222;
-        border-radius: 10px;
-        overflow: hidden;
-        margin-bottom: 15px;
-        border: 1px solid #00ff88;
-    }
-
-    #progress-bar {
-        width: 0%;
-        height: 100%;
-        background: linear-gradient(90deg, #00ff88, #66ffcc, #00ff88);
-        background-size: 200% 100%;
-        box-shadow: 0 0 15px #00ff88;
-        transition: width 0.5s ease;
-        animation: flow 2s linear infinite;
-        position: relative;
-        overflow: hidden;
-    }
-
-    #progress-bar::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -30%;
-        width: 30%;
-        height: 100%;
-        background: rgba(255,255,255,0.5);
-        transform: skewX(-25deg);
-        animation: shine 1.5s infinite;
-    }
-
-    @keyframes flow {
-        0% { background-position: 0% 0; }
-        100% { background-position: 200% 0; }
-    }
-
-    @keyframes shine {
-        0% { left: -30%; }
-        100% { left: 130%; }
-    }
-
-    .input-box {
-        display: flex;
-        width: 85%;
-        gap: 10px;
-    }
-
-    input {
-        flex: 1;
-        font-size: 1.5rem;
-        padding: 15px;
-        border: 2px solid #00ff88;
-        background: #000;
-        color: #fff;
-        border-radius: 8px;
-        outline: none;
-    }
-
-    button {
-        font-size: 1.5rem;
-        padding: 0 40px;
-        background: #00ff88;
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    button:active {
-        transform: scale(0.98);
-    }
-
-    /* 완료 화면 */
-    #success-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 255, 136, 0.95);
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        z-index: 2000;
-        color: #000;
-        animation: fadeIn 1.5s ease-in-out forwards;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    .success-text {
-        font-size: 6rem;
-        font-weight: 900;
-        margin-bottom: 20px;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-    }
-
-    .sub-text {
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
+*{box-sizing:border-box}
+body{margin:0;font-family:"Malgun Gothic","맑은 고딕",Arial,sans-serif;background:#f5f7fb;color:#182230}
+header{background:#172554;color:white;padding:22px 28px}
+header h1{margin:0 0 6px;font-size:28px}
+header p{margin:0;color:#dbeafe}
+.wrap{max-width:1200px;margin:20px auto;padding:0 16px}
+.card{background:white;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 18px rgba(15,23,42,.08)}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+label{font-weight:700;font-size:14px;display:flex;flex-direction:column;gap:6px}
+select,button{font:inherit;border:1px solid #cbd5e1;border-radius:9px;padding:9px 12px;background:white}
+button{cursor:pointer;font-weight:700}
+button.primary{background:#2563eb;color:white;border-color:#2563eb}
+button.secondary{background:#e2e8f0}
+button:disabled{opacity:.45;cursor:not-allowed}
+.layout{display:grid;grid-template-columns:1.45fr .85fr;gap:16px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}}
+#graph{width:100%;height:auto;display:block;border:1px solid #e2e8f0;border-radius:12px;background:#fbfdff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-top:10px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;vertical-align:-1px;margin-right:5px;border:1px solid #64748b}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.stat{background:#f8fafc;border-radius:10px;padding:12px}
+.stat b{display:block;font-size:21px;margin-top:4px}
+#order{line-height:1.8;word-break:break-all}
+.queue{font-family:ui-monospace,monospace;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px;min-height:42px}
+.explain{background:#eff6ff;border-left:5px solid #3b82f6;padding:12px;border-radius:8px;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+th,td{border-bottom:1px solid #e2e8f0;padding:8px;text-align:left}
+th{background:#f8fafc}
+.note{font-size:13px;color:#64748b}
 </style>
 </head>
-
 <body>
-
-<div id="success-overlay">
-    <div class="success-text">✨ 완벽해요! ✨</div>
-    <div class="sub-text">사이버 세상이 깨끗하게 정화되었습니다.</div>
+<header>
+<h1>🔎 BFS vs DFS 탐색 알고리즘 시뮬레이션</h1>
+<p>같은 그래프에서 너비 우선 탐색(BFS)과 깊이 우선 탐색(DFS)의 탐색 과정을 비교해 보세요.</p>
+</header>
+<div class="wrap">
+<div class="card">
+<div class="controls">
+<label>탐색 알고리즘
+<select id="algo"><option value="BFS">BFS · 너비 우선 탐색</option><option value="DFS">DFS · 깊이 우선 탐색</option></select></label>
+<label>시작 정점
+<select id="start"></select></label>
+<label>목표 정점
+<select id="target"></select></label>
+<label>그래프
+<select id="graphType"><option value="default">기본 그래프</option><option value="branch">분기형 그래프</option><option value="deep">깊은 경로 그래프</option></select></label>
+<button class="primary" id="run">▶ 탐색 시작</button>
+<button id="step">한 단계</button>
+<button class="secondary" id="reset">↻ 초기화</button>
+</div>
+<p class="note">실험 팁: 같은 시작점·목표점에서 BFS와 DFS를 각각 실행한 뒤 방문 순서와 방문 정점 수를 비교해 보세요.</p>
 </div>
 
-<div id="tv-screen"></div>
+<div class="layout">
+<div class="card">
+<canvas id="graph" width="760" height="500"></canvas>
+<div class="legend">
+<span><i class="dot" style="background:#fff"></i>미방문</span>
+<span><i class="dot" style="background:#fde68a"></i>탐색 대기/현재</span>
+<span><i class="dot" style="background:#86efac"></i>방문 완료</span>
+<span><i class="dot" style="background:#fca5a5"></i>목표</span>
+</div>
+<div class="stats">
+<div class="stat">현재 정점<b id="current">-</b></div>
+<div class="stat">방문 정점 수<b id="count">0</b></div>
+<div class="stat">상태<b id="status">대기</b></div>
+</div>
+</div>
 
-<div id="input-area">
+<div class="card">
+<h2>탐색 과정</h2>
+<div class="explain" id="explain">알고리즘과 시작·목표 정점을 선택하고 탐색을 시작하세요.</div>
+<h3>방문 순서</h3>
+<div id="order">-</div>
+<h3>탐색 목록</h3>
+<div class="queue" id="frontier">-</div>
+<h3>비교 기록</h3>
+<table>
+<thead><tr><th>알고리즘</th><th>방문 순서</th><th>방문 수</th></tr></thead>
+<tbody id="history"></tbody>
+</table>
+</div>
+</div>
 
-    <div id="status-msg">
-        SW CLUB PURIFICATION SYSTEM :
-        <span id="percent">0</span>% 
-        (<span id="count">0</span>/100)
-    </div>
-
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-    </div>
-
-    <div class="input-box">
-        <input type="text"
-               id="reply-input"
-               placeholder="이곳에 정화 로직(응원 메시지)을 입력하세요..."
-               onkeypress="if(event.keyCode==13) injectPurifier()">
-
-        <button onclick="injectPurifier()">업데이트</button>
-    </div>
-
+<div class="card">
+<h2>💡 생각해 보기</h2>
+<ol>
+<li>BFS와 DFS 중 어떤 알고리즘이 목표 정점에 먼저 도달했나요?</li>
+<li>같은 그래프에서 두 알고리즘의 방문 순서는 왜 달라질까요?</li>
+<li>목표 정점을 바꾸면 결과가 어떻게 달라지나요?</li>
+<li>가중치가 없는 그래프에서 BFS가 최단 간선 수 경로를 찾는 데 유리한 이유는 무엇일까요?</li>
+</ol>
+<p class="note">이 시뮬레이션은 그래프의 연결 관계와 탐색 규칙을 중심으로 모델링한 교육용 모형입니다. 실제 도로의 거리·시간·교통량·하드웨어 성능 등은 고려하지 않습니다.</p>
+</div>
 </div>
 
 <script>
-
-const badPhrases = [
-    "춤 왜 저래? 진짜 기괴함",
-    "노래 실력 실화? 귀 테러 오짐",
-    "진짜 노답이다 ㅋㅋㅋ",
-    "애쓴다 진짜... 저게 멋있나?",
-    "코디 실화냐? 진짜 할말하않",
-    "뚝딱거리는 거 보소 ㅋㅋㅋ",
-    "실력도 없으면서 자신감은 뭐임?",
-    "말투 극혐이다 진짜 바로 끔",
-    "영상 내리는 게 나을 듯",
-    "누가 너 좋대? 혼자 착각 지리네",
-    "열심히는 하는데 진짜 안쓰럽다",
-    "쟤는 왜 맨날 저래? 눈치 좀",
-    "아 진짜 극혐 ㅋㅋㅋ 분위기 다 흐리네",
-    "응 니 생각 아무도 안 궁금해~",
-    "실수 좀 적당히 해라 짜증남"
-];
-
-const goodPhrases = [];
-
-const tv = document.getElementById('tv-screen');
-
-let totalPurified = 0;
-let isFinished = false;
-
-/* 현재 떠있는 악플 저장 */
-let activeBadComments = [];
-
-/* ⚠ 악플 생성 */
-const badInterval = setInterval(() => {
-
-    if (isFinished) return;
-
-    const div = document.createElement('div');
-
-    div.className = 'bad';
-
-    div.innerText =
-        badPhrases[Math.floor(Math.random() * badPhrases.length)];
-
-    div.style.top = Math.random() * 85 + "%";
-
-    div.style.animationDuration =
-        (Math.random() * 5 + 10) + "s";
-
-    tv.appendChild(div);
-
-    activeBadComments.push(div);
-
-    setTimeout(() => {
-
-        div.remove();
-
-        activeBadComments =
-            activeBadComments.filter(v => v !== div);
-
-    }, 16000);
-
-}, 200);
-
-/* ✨ 고운말 반복 생성 */
-const goodInterval = setInterval(() => {
-
-    if (goodPhrases.length === 0 || isFinished) return;
-
-    const div = document.createElement('div');
-
-    div.className = 'good';
-
-    /* 저장된 고운말 랜덤 선택 */
-    const randomGood =
-        goodPhrases[
-            Math.floor(Math.random() * goodPhrases.length)
-        ];
-
-    div.innerText = "⭐ " + randomGood + " ⭐";
-
-    /* 랜덤 위치 */
-    div.style.top =
-        (Math.random() * 75) + "%";
-
-    /* 랜덤 크기 */
-    div.style.fontSize =
-        (Math.random() * 2 + 2.5) + "rem";
-
-    /* 랜덤 속도 */
-    div.style.animationDuration =
-        (Math.random() * 10 + 12) + "s";
-
-    /* 약간 더 밝게 */
-    div.style.opacity = "0.9";
-
-    tv.appendChild(div);
-
-    setTimeout(() => {
-        div.remove();
-    }, 25000);
-
-}, 2000);
-
-
-/* ✨ 정화 시스템 */
-function injectPurifier() {
-
-    const input = document.getElementById('reply-input');
-    const pText = document.getElementById('percent');
-    const cText = document.getElementById('count');
-    const pBar = document.getElementById('progress-bar');
-
-    if (input.value.trim() === "" || totalPurified >= 100) return;
-
-    const text = input.value;
-
-    totalPurified++;
-
-    pText.innerText = totalPurified;
-    cText.innerText = totalPurified;
-
-    pBar.style.width = totalPurified + "%";
-
-    /* ✨ 게이지 반응 */
-    pBar.animate([
-        { transform: "scaleY(1)" },
-        { transform: "scaleY(1.5)" },
-        { transform: "scaleY(1)" }
-    ], {
-        duration: 300
-    });
-
-    /* ✨ 고운말 출력 */
-    sendGoodLog(text);
-
-    goodPhrases.push(text);
-
-    /* 이미 제거된 악플 정리 */
-    activeBadComments =
-        activeBadComments.filter(el => document.body.contains(el));
-
-    /* ✨ 10개마다 악플 제거 */
-    if (totalPurified % 10 === 0 && activeBadComments.length > 0) {
-
-        /* 랜덤 악플 선택 */
-        const randomIndex =
-            Math.floor(Math.random() * activeBadComments.length);
-
-        const bad =
-            activeBadComments[randomIndex];
-
-        activeBadComments.splice(randomIndex, 1);
-
-        /* 삭제 강조 */
-        bad.style.zIndex = "999";
-        bad.style.opacity = "1";
-
-        const rect = bad.getBoundingClientRect();
-
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-
-        const moveX =
-            centerX - (rect.left + rect.width / 2);
-
-        const moveY =
-            centerY - (rect.top + rect.height / 2);
-
-        bad.animate([
-            {
-                transform: "scale(1)",
-                opacity: 1,
-                filter: "blur(0px)"
-            },
-            {
-                transform:
-                    `translate(${moveX}px, ${moveY}px)
-                    scale(2)
-                    rotate(10deg)`,
-                opacity: 1,
-                filter: "drop-shadow(0 0 30px red)"
-            },
-            {
-                transform:
-                    `translate(${moveX}px, ${moveY}px)
-                    scale(0)
-                    rotate(720deg)`,
-                opacity: 0,
-                filter: "blur(15px)"
-            }
-        ], {
-            duration: 1200,
-            easing: "ease-in-out"
-        });
-
-        /* 💥 정화 폭발 */
-        const flash = document.createElement("div");
-
-        flash.style.position = "fixed";
-        flash.style.left = "50%";
-        flash.style.top = "50%";
-        flash.style.width = "300px";
-        flash.style.height = "300px";
-        flash.style.transform = "translate(-50%, -50%)";
-        flash.style.borderRadius = "50%";
-
-        flash.style.background =
-            "radial-gradient(circle, rgba(0,255,136,0.9) 0%, rgba(0,255,136,0) 70%)";
-
-        flash.style.pointerEvents = "none";
-        flash.style.zIndex = "2000";
-
-        document.body.appendChild(flash);
-
-        flash.animate([
-            {
-                transform: "translate(-50%, -50%) scale(0.3)",
-                opacity: 1
-            },
-            {
-                transform: "translate(-50%, -50%) scale(2)",
-                opacity: 0
-            }
-        ], {
-            duration: 800,
-            easing: "ease-out"
-        });
-
-        setTimeout(() => {
-            flash.remove();
-            bad.remove();
-        }, 1200);
-    }
-
-    /* 🎉 완료 */
-    if (totalPurified === 100) {
-
-        isFinished = true;
-
-        setTimeout(() => {
-
-            document.getElementById('success-overlay').style.display = 'flex';
-
-        }, 800);
-    }
-
-    input.value = "";
-    input.focus();
+const graphs = {
+ default:{
+  pos:{A:[100,250],B:[250,120],C:[250,380],D:[410,90],E:[410,250],F:[410,410],G:[590,120],H:[590,300],I:[690,220]},
+  adj:{A:["B","C"],B:["A","D","E"],C:["A","E","F"],D:["B","G"],E:["B","C","G","H"],F:["C","H"],G:["D","E","I"],H:["E","F","I"],I:["G","H"]}
+ },
+ branch:{
+  pos:{A:[100,250],B:[250,100],C:[250,250],D:[250,400],E:[430,70],F:[430,150],G:[430,260],H:[430,340],I:[430,440],J:[610,110],K:[610,280],L:[610,420]},
+  adj:{A:["B","C","D"],B:["A","E","F"],C:["A","G"],D:["A","H","I"],E:["B","J"],F:["B","J"],G:["C","K"],H:["D","K"],I:["D","L"],J:["E","F"],K:["G","H"],L:["I"]}
+ },
+ deep:{
+  pos:{A:[80,250],B:[190,180],C:[190,330],D:[300,180],E:[300,330],F:[410,180],G:[410,330],H:[520,180],I:[520,330],J:[630,180],K:[630,330],L:[710,255]},
+  adj:{A:["B","C"],B:["A","D"],C:["A","E"],D:["B","F"],E:["C","G"],F:["D","H"],G:["E","I"],H:["F","J"],I:["G","K"],J:["H","L"],K:["I","L"],L:["J","K"]}
+ }
+};
+
+const canvas=document.getElementById("graph"), ctx=canvas.getContext("2d");
+let graph=graphs.default, state=null, timer=null, history=[];
+const $=id=>document.getElementById(id);
+
+function fillSelects(){
+ const keys=Object.keys(graph.pos);
+ $("start").innerHTML=keys.map(k=>`<option>${k}</option>`).join("");
+ $("target").innerHTML=keys.map(k=>`<option>${k}</option>`).join("");
+ $("start").value="A"; $("target").value=keys[keys.length-1];
+}
+fillSelects();
+
+$("graphType").onchange=()=>{
+ graph=graphs[$("graphType").value]; fillSelects(); reset();
+};
+
+function neighbors(v){return graph.adj[v]||[];}
+
+function init(){
+ const algo=$("algo").value, start=$("start").value, target=$("target").value;
+ if(start===target){ $("target").value=Object.keys(graph.pos).find(x=>x!==start); }
+ const t=$("target").value;
+ state={algo,start,target,visited:new Set(),order:[],frontier:[start],current:null,done:false,found:false,parent:{}};
+ draw(); update();
+ $("status").textContent="준비";
+ $("explain").textContent=algo==="BFS"
+ ?"BFS는 큐를 사용하여 시작점에서 가까운 정점부터 차례로 탐색합니다."
+ :"DFS는 스택(또는 재귀적 호출)을 사용하여 한 경로를 가능한 깊게 탐색합니다.";
 }
 
-/* ✨ 고운말 생성 */
-function sendGoodLog(content) {
-
-    const div = document.createElement('div');
-
-    div.className = 'good';
-
-    div.innerText = "⭐ " + content + " ⭐";
-
-    /* 랜덤 위치 */
-    div.style.top =
-        (Math.random() * 75) + "%";
-
-    /* 랜덤 크기 */
-    div.style.fontSize =
-        (Math.random() * 2 + 3) + "rem";
-
-    /* 랜덤 속도 */
-    div.style.animationDuration =
-        (Math.random() * 10 + 15) + "s";
-
-    tv.appendChild(div);
-
-    setTimeout(() => div.remove(), 26000);
+function nextStep(){
+ if(!state||state.done) return;
+ if(state.frontier.length===0){finish(false);return;}
+ let v = state.algo==="BFS" ? state.frontier.shift() : state.frontier.pop();
+ if(state.visited.has(v)){nextStep();return;}
+ state.current=v; state.visited.add(v); state.order.push(v);
+ if(v===state.target){finish(true);return;}
+ let ns=neighbors(v);
+ if(state.algo==="DFS") ns=[...ns].reverse();
+ for(const n of ns){
+   if(!state.visited.has(n) && !state.frontier.includes(n)){
+      state.frontier.push(n); if(!state.parent[n]) state.parent[n]=v;
+   }
+ }
+ draw(); update();
 }
 
+function finish(found){
+ state.done=true; state.found=found;
+ $("status").textContent=found?"목표 도달":"탐색 종료";
+ $("explain").textContent=found
+ ?`${state.algo}가 목표 정점 ${state.target}을(를) 발견했습니다.`
+ :`${state.algo}가 탐색할 정점을 모두 확인했지만 목표를 찾지 못했습니다.`;
+ draw(); update();
+ if(found) saveHistory();
+}
+
+function run(){
+ init();
+ clearInterval(timer);
+ timer=setInterval(()=>{
+   if(state.done){clearInterval(timer);return;}
+   nextStep();
+ },650);
+}
+function reset(){
+ clearInterval(timer); state=null;
+ $("current").textContent="-"; $("count").textContent="0"; $("status").textContent="대기";
+ $("order").textContent="-"; $("frontier").textContent="-";
+ $("explain").textContent="알고리즘과 시작·목표 정점을 선택하고 탐색을 시작하세요.";
+ draw();
+}
+
+function update(){
+ if(!state)return;
+ $("current").textContent=state.current||"-";
+ $("count").textContent=state.order.length;
+ $("order").textContent=state.order.join(" → ")||"-";
+ $("frontier").textContent=state.frontier.join("  |  ")||"비어 있음";
+}
+
+function saveHistory(){
+ const key=state.algo+"|"+state.start+"|"+state.target+"|"+$("graphType").value;
+ if(history.some(x=>x.key===key)) return;
+ history.push({key,algo:state.algo,order:state.order.join(" → "),count:state.order.length});
+ $("history").innerHTML=history.slice(-6).map(x=>`<tr><td>${x.algo}</td><td>${x.order}</td><td>${x.count}</td></tr>`).join("");
+}
+
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ const adj=graph.adj;
+ // edges
+ ctx.lineWidth=2; ctx.strokeStyle="#cbd5e1";
+ const drawn=new Set();
+ for(const a in adj) for(const b of adj[a]){
+   const key=[a,b].sort().join("-");
+   if(drawn.has(key))continue; drawn.add(key);
+   const p=graph.pos[a], q=graph.pos[b];
+   ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();
+ }
+ // nodes
+ for(const [v,p] of Object.entries(graph.pos)){
+   let fill="#ffffff";
+   if(state){
+     if(v===state.target && state.done) fill="#fca5a5";
+     else if(v===state.current) fill="#fde68a";
+     else if(state.visited.has(v)) fill="#86efac";
+     else if(state.frontier.includes(v)) fill="#fef3c7";
+   }
+   ctx.beginPath();ctx.arc(p[0],p[1],25,0,Math.PI*2);
+   ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle="#475569";ctx.lineWidth=2;ctx.stroke();
+   ctx.fillStyle="#0f172a";ctx.font="bold 17px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(v,p[0],p[1]);
+   if(state && v===state.start){ctx.font="12px Arial";ctx.fillStyle="#2563eb";ctx.fillText("START",p[0],p[1]-38);}
+   if(state && v===state.target){ctx.font="12px Arial";ctx.fillStyle="#dc2626";ctx.fillText("TARGET",p[0],p[1]+39);}
+ }
+}
+
+$("run").onclick=run;
+$("step").onclick=()=>{if(!state)init(); nextStep();};
+$("reset").onclick=reset;
+$("algo").onchange=()=>{reset();};
+$("start").onchange=()=>{reset();};
+$("target").onchange=()=>{reset();};
 </script>
-
 </body>
 </html>
